@@ -1,0 +1,85 @@
+// Sample Pokémon database 
+const POKEMON = [
+  {
+    name: "PIKACHU", 
+    type1: "Electric", 
+    type2: null,
+    generation: 1,
+    height: 0.4,
+    weight: 6.0
+  },
+  {
+    name: "CHARIZARD", 
+    type1: "Fire", 
+    type2: "Flying",
+    generation: 1,
+    height: 1.7,
+    weight: 90.5
+  },
+  // Add more Pokémon...
+];
+
+// Game state
+let targetPokemon = null;
+let guesses = [];
+let currentGuess = "";
+let gameOver = false;
+
+// Initialize game
+function initializeGame() {
+  // Choose random Pokémon from database
+  targetPokemon = POKEMON[Math.floor(Math.random() * POKEMON.length)];
+  console.log("Target Pokémon:", targetPokemon.name); // For testing
+  
+  // Create game board with attribute columns
+  createGameBoard();
+  
+  // Setup Pokémon selector/input
+  setupPokemonInput();
+}
+
+// Check guess
+function checkGuess(guessedPokemon) {
+  const feedback = {
+    name: guessedPokemon.name,
+    type1: guessedPokemon.type1 === targetPokemon.type1 ? "correct" : "wrong",
+    type2: guessedPokemon.type2 === targetPokemon.type2 ? "correct" : "wrong",
+    generation: guessedPokemon.generation === targetPokemon.generation ? "correct" : 
+                (guessedPokemon.generation < targetPokemon.generation ? "higher" : "lower"),
+    height: guessedPokemon.height === targetPokemon.height ? "correct" : 
+            (guessedPokemon.height < targetPokemon.height ? "higher" : "lower"),
+    weight: guessedPokemon.weight === targetPokemon.weight ? "correct" : 
+            (guessedPokemon.weight < targetPokemon.weight ? "higher" : "lower"),
+  };
+  
+  return feedback;
+}
+
+// Submit guess
+function submitGuess() {
+  // Find the Pokémon in the database
+  const guessedPokemon = POKEMON.find(p => p.name === currentGuess);
+  
+  if (!guessedPokemon) {
+    showMessage("Not a valid Pokémon!");
+    return;
+  }
+  
+  // Get feedback
+  const feedback = checkGuess(guessedPokemon);
+  guesses.push(feedback);
+  
+  // Update display
+  updateGameBoard();
+  
+  // Check win condition
+  if (guessedPokemon.name === targetPokemon.name) {
+    showMessage("You caught it! It's " + targetPokemon.name + "!");
+    gameOver = true;
+  } else if (guesses.length >= 8) { // Allow 8 attempts
+    showMessage("Game over! It was " + targetPokemon.name + "!");
+    gameOver = true;
+  }
+  
+  currentGuess = "";
+}
